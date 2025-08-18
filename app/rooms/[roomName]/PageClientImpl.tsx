@@ -29,6 +29,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useSetupE2EE } from '@/lib/useSetupE2EE';
 import { useLowCPUOptimizer } from '@/lib/usePerfomanceOptimiser';
+import { DeviceErrorPopup } from '@/lib/DeviceErrorPopup';
 
 const CONN_DETAILS_ENDPOINT =
   process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? '/api/connection-details';
@@ -65,7 +66,7 @@ export function PageClientImpl(props: {
     const connectionDetailsResp = await fetch(url.toString());
     const connectionDetailsData = await connectionDetailsResp.json();
     setConnectionDetails(connectionDetailsData);
-  }, []);
+  }, [props.roomName, props.region]);
   const handlePreJoinError = React.useCallback((e: any) => console.error(e), []);
 
   return (
@@ -97,11 +98,14 @@ function VideoConferenceComponent(props: {
     codec: VideoCodec;
   };
 }) {
-  const keyProvider = new ExternalE2EEKeyProvider();
+  const keyProvider = React.useMemo(() => new ExternalE2EEKeyProvider(), []);
   const { worker, e2eePassphrase } = useSetupE2EE();
   const e2eeEnabled = !!(e2eePassphrase && worker);
 
   const [e2eeSetupComplete, setE2eeSetupComplete] = React.useState(false);
+  const [deviceError, setDeviceError] = React.useState<Error | null>(null);
+  const [isErrorPopupOpen, setIsErrorPopupOpen] = React.useState(false);
+  const [errorType, setErrorType] = React.useState<'camera' | 'microphone' | 'general'>('general');
 
   const roomOptions = React.useMemo((): RoomOptions => {
     let videoCodec: VideoCodec | undefined = props.options.codec ? props.options.codec : 'vp9';
@@ -130,9 +134,9 @@ function VideoConferenceComponent(props: {
       dynacast: true,
       e2ee: keyProvider && worker && e2eeEnabled ? { keyProvider, worker } : undefined,
     };
-  }, [props.userChoices, props.options.hq, props.options.codec]);
+  }, [props.userChoices, props.options.hq, props.options.codec, e2eeEnabled, keyProvider, worker]);
 
-  const room = React.useMemo(() => new Room(roomOptions), []);
+  const room = React.useMemo(() => new Room(roomOptions), [roomOptions]);
 
   React.useEffect(() => {
     if (e2eeEnabled) {
@@ -141,9 +145,9 @@ function VideoConferenceComponent(props: {
         .then(() => {
           room.setE2EEEnabled(true).catch((e) => {
             if (e instanceof DeviceUnsupportedError) {
-              alert(
-                `You're trying to join an encrypted meeting, but your browser does not support it. Please update it to the latest version and try again.`,
-              );
+              setErrorType('general');
+              setDeviceError(new Error('Ваш браузер не поддерживает зашифрованные встречи. Пожалуйста, обновите браузер до последней версии и попробуйте снова.'));
+              setIsErrorPopupOpen(true);
               console.error(e);
             } else {
               throw e;
@@ -201,13 +205,30 @@ function VideoConferenceComponent(props: {
   const handleOnLeave = React.useCallback(() => router.push('/'), [router]);
   const handleError = React.useCallback((error: Error) => {
     console.error(error);
-    alert(`Encountered an unexpected error, check the console logs for details: ${error.message}`);
+    
+    // Определяем тип ошибки
+    let type: 'camera' | 'microphone' | 'general' = 'general';
+    
+    if (error.message.includes('camera') || error.message.includes('video')) {
+      type = 'camera';
+    } else if (error.message.includes('microphone') || error.message.includes('audio')) {
+      type = 'microphone';
+    }
+    
+    setErrorType(type);
+    setDeviceError(error);
+    setIsErrorPopupOpen(true);
   }, []);
   const handleEncryptionError = React.useCallback((error: Error) => {
     console.error(error);
-    alert(
-      `Encountered an unexpected encryption error, check the console logs for details: ${error.message}`,
-    );
+    setErrorType('general');
+    setDeviceError(error);
+    setIsErrorPopupOpen(true);
+  }, []);
+
+  const closeErrorPopup = React.useCallback(() => {
+    setIsErrorPopupOpen(false);
+    setDeviceError(null);
   }, []);
 
   React.useEffect(() => {
@@ -227,6 +248,13 @@ function VideoConferenceComponent(props: {
         <DebugMode />
         <RecordingIndicator />
       </RoomContext.Provider>
+      
+      <DeviceErrorPopup
+        isOpen={isErrorPopupOpen}
+        onClose={closeErrorPopup}
+        error={deviceError}
+        errorType={errorType}
+      />
     </div>
   );
 }

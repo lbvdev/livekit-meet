@@ -6,30 +6,20 @@ import {
   useLocalParticipant,
   VideoTrack,
 } from '@livekit/components-react';
-import { BackgroundBlur, VirtualBackground } from '@livekit/track-processors';
 import { isLocalTrack, LocalTrackPublication, Track } from 'livekit-client';
 import Desk from '../public/background-images/samantha-gades-BlIhVfXbi9s-unsplash.jpg';
 import Nature from '../public/background-images/ali-kazal-tbw_KQE3Cbg-unsplash.jpg';
 
-// Background image paths
 const BACKGROUND_IMAGES = [
   { name: 'Desk', path: Desk },
   { name: 'Nature', path: Nature },
 ];
 
-// Background options
 type BackgroundType = 'none' | 'blur' | 'image';
 
 export function CameraSettings() {
   const { cameraTrack, localParticipant } = useLocalParticipant();
-  const [backgroundType, setBackgroundType] = React.useState<BackgroundType>(
-    (cameraTrack as LocalTrackPublication)?.track?.getProcessor()?.name === 'background-blur'
-      ? 'blur'
-      : (cameraTrack as LocalTrackPublication)?.track?.getProcessor()?.name === 'virtual-background'
-        ? 'image'
-        : 'none',
-  );
-
+  const [backgroundType, setBackgroundType] = React.useState<BackgroundType>('none');
   const [virtualBackgroundImagePath, setVirtualBackgroundImagePath] = React.useState<string | null>(
     null,
   );
@@ -50,14 +40,24 @@ export function CameraSettings() {
   };
 
   React.useEffect(() => {
-    if (isLocalTrack(cameraTrack?.track)) {
-      if (backgroundType === 'blur') {
-        cameraTrack.track?.setProcessor(BackgroundBlur());
-      } else if (backgroundType === 'image' && virtualBackgroundImagePath) {
-        cameraTrack.track?.setProcessor(VirtualBackground(virtualBackgroundImagePath));
-      } else {
-        cameraTrack.track?.stopProcessor();
-      }
+    if (typeof window !== 'undefined' && isLocalTrack(cameraTrack?.track)) {
+      const applyBackground = async () => {
+        try {
+          if (backgroundType === 'blur') {
+            const { BackgroundBlur } = await import('@livekit/track-processors');
+            (cameraTrack.track as any).setProcessor(BackgroundBlur());
+          } else if (backgroundType === 'image' && virtualBackgroundImagePath) {
+            const { VirtualBackground } = await import('@livekit/track-processors');
+            (cameraTrack.track as any).setProcessor(VirtualBackground(virtualBackgroundImagePath));
+          } else {
+            (cameraTrack.track as any).stopProcessor();
+          }
+        } catch (error) {
+          console.warn('Failed to apply background effect:', error);
+        }
+      };
+
+      applyBackground();
     }
   }, [cameraTrack, backgroundType, virtualBackgroundImagePath]);
 

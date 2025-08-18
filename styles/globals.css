@@ -65,3 +65,37 @@ h2 a {
 h2 a {
   text-decoration: none;
 }
+
+
+.lk-button{
+  text-decoration: none;
+}
+
+.menu-button {
+  flex: 1;
+  width: 100%;
+
+  span{
+    font-size: 1rem;
+    opacity: 0.3;
+
+    width: 100%;
+    text-align: right;
+  }
+}
+
+hr{
+  width: 100%;
+  opacity: 0.1;
+}
+
+.menu-input{
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--lk-border-radius);
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.8);
+
+  text-align: center;
+}
