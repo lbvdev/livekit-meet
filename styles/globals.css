@@ -2,6 +2,15 @@
   box-sizing: border-box;
 }
 
+:root {
+  --accent-color: #5F00FF;
+  --secondary-color: #9c70f7;
+  --secondary-05-color: rgba(156, 112, 247, 0.5);
+
+  --text-color: #fff;
+  --text-color-secondary: rgba(255, 255, 255, 0.50);
+}
+
 html {
   color-scheme: dark;
   background-color: #111;
@@ -10,50 +19,43 @@ html {
 html,
 body {
   overflow: hidden;
+  
   width: 100%;
   height: 100%;
   margin: 0px;
+  padding: 0px;
+  
+  background-color: var(--accent-color);
 }
 
 body {
   display: flex;
   flex-direction: column;
+  
+  * {
+    font-family: Inter, sans-serif !important;
+  }
 }
 
-.header {
-  max-width: 500px;
-  padding-inline: 2rem;
-}
-
-.header > img {
-  display: block;
-  margin: auto;
-  max-width: 100%;
-}
-
-.header > h2 {
-  font-family: 'TWK Everett', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 1.25rem;
-  line-height: 144%;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.6);
-}
 
 footer {
+  position: fixed;
+
+  bottom: 0px;
   width: 100%;
   padding: 1.5rem 2rem;
-  text-align: center;
+  
+  background-color: rgba(95, 0, 255, 0.5);
   color: rgba(255, 255, 255, 0.6);
-  background-color: var(--lk-bg);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 2px solid rgba(255, 255, 255, 0.15);
+
+  text-align: center;
 }
 
 footer a,
 h2 a {
-  color: #ff6352;
-  text-decoration-color: #a33529;
+  color: #fff;
+  text-decoration-color: #fff;
   text-underline-offset: 0.125em;
 }
 

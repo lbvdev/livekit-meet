@@ -3,10 +3,13 @@ import '@livekit/components-styles';
 import '@livekit/components-styles/prefabs';
 import type { Metadata, Viewport } from 'next';
 import { Toaster } from 'react-hot-toast';
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin', 'cyrillic'] });
 
 export const metadata: Metadata = {
   title: {
-    default: 'LiveKit Meet | Conference app build with LiveKit open source',
+    default: 'Jump in meeting with SeniWave',
     template: '%s',
   },
   description:
@@ -17,16 +20,16 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
   },
   openGraph: {
-    url: 'https://meet.livekit.io',
+    url: 'https://meet.seniwave.com',
     images: [
       {
-        url: 'https://meet.livekit.io/images/livekit-meet-open-graph.png',
+        url: 'https://meet.seniwave.com/images/livekit-meet-open-graph.png',
         width: 2000,
         height: 1000,
         type: 'image/png',
       },
     ],
-    siteName: 'LiveKit Meet',
+    siteName: 'Jump in meeting with SeniWave',
   },
   icons: {
     icon: {
@@ -45,7 +48,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#070707',
+  themeColor: '#5f00ff',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

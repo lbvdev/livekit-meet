@@ -1,0 +1,12 @@
+{
+  "emmet.includeLanguages": {
+    "typescript": "html",
+    "typescriptreact": "html"
+  },
+  "emmet.triggerExpansionOnTab": true,
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "typescript.suggest.includeCompletionsForImportStatements": true,
+  "typescript.preferences.includePackageJsonAutoImports": "on"
+}

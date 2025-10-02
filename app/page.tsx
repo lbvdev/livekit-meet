@@ -6,30 +6,48 @@ import { encodePassphrase, generateRoomId, randomString } from '@/lib/client-uti
 import styles from '../styles/Home.module.css';
 import Link from 'next/link';
 import Image from 'next/image';
+import {
+  PageContainer,
+  GroupContainer,
+  FormContainer,
+  SideContainer,
+
+  HeadContainer,
+  MediaButtonsGroup,
+  MediaInputButton,
+  TextInput,
+  JoinButton,
+  Button,
+
+  VideoContainer,
+  CameraOffMessage,
+
+  BackgroundImage,
+} from '@/components/CustomPreJoin.styles';
+import { CodeInputComponent } from '@/components/CodeInputComponent';
 
 function DemoMeeting() {
   const router = useRouter();
   const [e2ee, setE2ee] = useState(false);
   const [sharedPassphrase, setSharedPassphrase] = useState(randomString(64));
-  const [homeRoomParticipants, setHomeRoomParticipants] = useState<number | null>(null);
-  
-  const fetchParticipants = async () => {
-    try {
-      const response = await fetch('/api/room-participants?roomName=home');
-      const data = await response.json();
-      setHomeRoomParticipants(data.participantCount);
-    } catch (error) {
-      console.error('Error fetching participants:', error);
-      setHomeRoomParticipants(0);
+  const [roomName, setRoomName] = useState('');
+
+  const joinMeeting = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
     }
-  };
-  
-  React.useEffect(() => {
-    fetchParticipants();
-    const interval = setInterval(fetchParticipants, 2000);
-    return () => clearInterval(interval);
-  }, []);
-  
+    
+    if (!roomName.trim()) {
+      alert('Please enter the room code');
+      return;
+    }
+    
+    if (e2ee) {
+      router.push(`/rooms/${roomName.trim()}#${encodePassphrase(sharedPassphrase)}`);
+    } else {
+      router.push(`/rooms/${roomName.trim()}`);
+    }
+  }
   const startMeeting = () => {
     if (e2ee) {
       router.push(`/rooms/${generateRoomId()}#${encodePassphrase(sharedPassphrase)}`);
@@ -38,51 +56,32 @@ function DemoMeeting() {
     }
   };
   return (
-    <div className={styles.tabContent}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' }}>
-        <Link className="lk-button" href="/rooms/home">
-          Join room &quot;Home&quot;
-          {homeRoomParticipants !== null && (
-            <span style={{ fontSize: '1rem', opacity: 0.3, width: '100%', textAlign: 'right' }}>
-              {homeRoomParticipants}
-            </span>
-          )}
-        </Link>
-        <Link className="lk-button" href="/rooms/second">
-          Join room &quot;Second&quot;
-          {homeRoomParticipants !== null && (
-            <span style={{ fontSize: '1rem', opacity: 0.3, width: '100%', textAlign: 'right' }}>
-              {homeRoomParticipants}
-            </span>
-          )}
-        </Link>
-      </div>
-      <button className="lk-button" onClick={startMeeting}>
-        Create private room
-      </button>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
-          <input
-            id="use-e2ee"
-            type="checkbox"
-            checked={e2ee}
-            onChange={(ev) => setE2ee(ev.target.checked)}
-          ></input>
-          <label htmlFor="use-e2ee">Enable end-to-end encryption</label>
-        </div>
-        {e2ee && (
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
-            <label htmlFor="passphrase">Passphrase</label>
-            <input
-              id="passphrase"
-              type="password"
-              value={sharedPassphrase}
-              onChange={(ev) => setSharedPassphrase(ev.target.value)}
-            />
-          </div>
-        )}
-      </div>
-    </div>
+    <PageContainer>
+      <SideContainer>
+        <FormContainer gap="2rem" onSubmit={joinMeeting}>
+          <HeadContainer>
+            <h1>Search for your meeting</h1>
+            <p><b>Continue with your code from email</b></p>
+          </HeadContainer>
+
+          <CodeInputComponent 
+            value={roomName} 
+            onChange={setRoomName}
+            placeholder=""
+            autoFocus
+          />
+
+          <JoinButton type="submit">
+            <span>Next</span>
+          </JoinButton>
+        </FormContainer>
+        <Button onClick={startMeeting}>
+          Create new private room
+        </Button>
+      </SideContainer>
+
+      <BackgroundImage src="/background-images/3d.png" alt="3d" width={100} height={100}/>
+    </PageContainer>
   );
 }
 
@@ -90,32 +89,14 @@ export default function Page() {
   return (
     <>
       <main className={styles.main} data-lk-theme="default">
-        <div className="header">
-          <Image src="/images/livekit-meet-home.svg" alt="LiveKit Meet" width={360} height={45} />
-          <h2>
-            Open source video conferencing app built on{' '}
-            <a href="https://github.com/livekit/components-js?ref=meet" rel="noopener">
-              LiveKit&nbsp;Components
-            </a>
-            ,{' '}
-            <a href="https://livekit.io/cloud?ref=meet" rel="noopener">
-              LiveKit&nbsp;Cloud
-            </a>{' '}
-            and Next.js, hosted and modified by{' '}
-            <a href="https://lbvo.ru" rel="noopener">
-              @lbv_dev
-            </a>
-            .
-          </h2>
-        </div>
         <Suspense fallback="Loading">
           <DemoMeeting />
         </Suspense>
       </main>
       <footer data-lk-theme="default">
-        Hosted by{' '}
-        <a href="https://lbvo.ru" rel="noopener">
-          @lbv_dev
+        Hosted and modified by{' '}
+        <a href="https://seniwave.com" rel="noopener">
+          SeniWave
         </a>
         . Source code and license on{' '}
         <a href="https://github.com/gromlbv/livekit-meet?ref=meet" rel="noopener">

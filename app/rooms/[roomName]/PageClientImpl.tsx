@@ -10,10 +10,10 @@ import { ConnectionDetails } from '@/lib/types';
 import {
   formatChatMessageLinks,
   LocalUserChoices,
-  PreJoin,
   RoomContext,
   VideoConference,
 } from '@livekit/components-react';
+import { CustomPreJoin } from '@/components/CustomPreJoin';
 import {
   ExternalE2EEKeyProvider,
   RoomOptions,
@@ -72,13 +72,11 @@ export function PageClientImpl(props: {
   return (
     <main data-lk-theme="default" style={{ height: '100%' }}>
       {connectionDetails === undefined || preJoinChoices === undefined ? (
-        <div style={{ display: 'grid', placeItems: 'center', height: '100%' }}>
-          <PreJoin
-            defaults={preJoinDefaults}
-            onSubmit={handlePreJoinSubmit}
-            onError={handlePreJoinError}
-          />
-        </div>
+        <CustomPreJoin
+          defaults={preJoinDefaults}
+          onSubmit={handlePreJoinSubmit}
+          onError={handlePreJoinError}
+        />
       ) : (
         <VideoConferenceComponent
           connectionDetails={connectionDetails}
@@ -206,7 +204,6 @@ function VideoConferenceComponent(props: {
   const handleError = React.useCallback((error: Error) => {
     console.error(error);
     
-    // Определяем тип ошибки
     let type: 'camera' | 'microphone' | 'general' = 'general';
     
     if (error.message.includes('camera') || error.message.includes('video')) {
