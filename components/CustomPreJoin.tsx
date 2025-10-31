@@ -217,7 +217,7 @@ export function CustomPreJoin({
         </MediaButtonsGroup>
       </SideContainer>
 
-      <BackgroundImage src="/background-images/3d.png" alt="3d" width={100} height={100}/>
+      <BackgroundImage src="/background-images/3d-background.png" alt="3d" width={100} height={100}/>
     </PageContainer>
       <footer data-lk-theme="default">
         Hosted and modified by{' '}
