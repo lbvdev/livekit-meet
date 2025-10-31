@@ -13,10 +13,10 @@ export const metadata: Metadata = {
     template: '%s',
   },
   description:
-    'LiveKit is an open source WebRTC project that gives you everything needed to build scalable and real-time audio and/or video experiences in your applications.',
+    'SeniWave Meet — modern video conferencing service by SeniWave web studio, based on LiveKit. High-quality video calls with encryption, screen sharing, and multiple participants.',
   twitter: {
-    creator: '@livekitted',
-    site: '@livekitted',
+    creator: '@SWave_Partners',
+    site: '@SWave_Partners',
     card: 'summary_large_image',
   },
   openGraph: {
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
         url: '/images/meet-apple-touch.png',
         sizes: '180x180',
       },
-      { rel: 'mask-icon', url: '/images/meet-safari-pinned-tab.svg', color: '#070707' },
+      { rel: 'mask-icon', url: '/images/meet-safari-pinned-tab.svg', color: '#5f00ff' },
     ],
   },
 };
